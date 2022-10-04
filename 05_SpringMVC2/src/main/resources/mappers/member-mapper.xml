@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberMapper">
+	<resultMap type="com.kh.junspring.member.domain.Member" id="memberResultMap">
+		<id property="memberId" column="MEMBER_ID"/>
+		<result property="memberPwd" column="MEMBER_PWD" />
+		<result property="memberName" column="MEMBER_NAME" />
+		<result property="memberEmail" column="MEMBER_EMAIL" />
+		<result property="memberPhone" column="MEMBER_PHONE" />
+		<result property="memberAddr" column="MEMBER_ADDR" />
+		<result property="enrollDate" column="ENROLL_DATE" />
+		<result property="updateDate" column="UPDATE_DATE" />
+		<result property="mStatus" column="M_STATUS" />
+	</resultMap>
+	<select id="selectCheckOne" resultType="_int">
+		<!-- 결과로 받을 자료형을 정함 -->
+		SELECT COUNT(*) FROM MEMBER_TBL
+	
+	</select>
+	<insert id="insertMember" parameterType="Member" >
+		INSERT INTO MEMBER_TBL
+		VALUES(#{memberId},#{memberPwd},#{memberName},#{memberEmail},#{memberPhone},#{memberAddr},DEFAULT,DEFAULT,DEFAULT)
+	</insert>
+	<select id="selectLoginOne" resultMap="memberResultMap">
+		SELECT MEMBER_ID, MEMBER_NAME FROM MEMBER_TBL WHERE MEMBER_ID = #{memberId} AND MEMBER_PWD =#{memberPwd} AND M_STATUS = 'Y'
+	</select>
+	<select id="selectOneById" resultMap="memberResultMap">
+		SELECT * FROM MEMBER_TBL WHERE MEMBER_ID = #{memberId }
+	</select>
+	<update id="updateMember">
+		UPDATE MEMBER_TBL SET MEMBER_PWD = #{memberPwd }, MEMBER_EMAIL = #{memberEmail }, MEMBER_PHONE = #{memberPhone }, MEMBER_ADDR = #{memberAddr } WHERE MEMBER_ID = #{memberId }
+	</update>
+	<update id="deleteMember">
+		UPDATE MEMBER_TBL SET M_STATUS = 'N' WHERE MEMBER_ID = #{memberId}
+	</update>
+	<!-- 데이터를 삭제하지 않고 M STATUS만 변경해줘서 사용불가처리로 만들되 추후 복구 혹은 데이터 관리가 가능하도록 처리 -->
+	<!-- <delete id="deleteMember">
+		DELETE FROM MEMBER_TBL WHERE MEMBER_ID = #{memberId}
+	</delete> -->
+</mapper>
