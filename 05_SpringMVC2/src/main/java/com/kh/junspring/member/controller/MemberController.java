@@ -1,6 +1,8 @@
 package com.kh.junspring.member.controller;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.kh.junspring.member.domain.Member;
@@ -191,4 +194,21 @@ public class MemberController {
 		}
 		
 	}
+	@ResponseBody
+	@RequestMapping(value="/member/checkId.kh" , method = RequestMethod.GET)
+	public String checkMemberId(
+			@RequestParam(value = "insertid" ,required = false) String insertid) {
+		//mapper에서 돌릴건지 controller에서 리스트를 모두 가져와서 돌릴건지? 여기서
+		//여기서 돌리면 해당 아이디값도 반환할 수 있음 / ka0ka0ka는 사용중인 아이디입니다.
+		List<Member> mList = mService.searchAllMember();
+		for(Member mOne : mList) {
+			if(mOne.getMemberId().equals(insertid)) {
+				return insertid;
+			}
+		}
+		return null;
+	}
+	
+	
+	
 }

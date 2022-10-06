@@ -72,5 +72,15 @@ public class BoardServiceImpl implements BoardService{
 		List<Reply> rList = bStore.selectAllReply(session,refBoardNo);
 		return rList;
 	}
+	@Override
+	public int removeReply(Integer replyNo) {
+		int result = bStore.deleteReply(session, replyNo);
+		return result;
+	}
+	@Override
+	public int modifyReply(Reply reply) {
+		int result;
+		return 0;
+	}
 
 }

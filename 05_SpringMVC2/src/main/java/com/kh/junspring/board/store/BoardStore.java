@@ -31,4 +31,6 @@ public interface BoardStore {
 
 	public List<Reply> selectAllReply(SqlSession session, int refBoardNo);
 
+	public int deleteReply(SqlSession session, Integer replyNo);
+
 }

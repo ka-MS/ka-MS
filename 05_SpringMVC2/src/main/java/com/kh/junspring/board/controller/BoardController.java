@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kh.junspring.board.domain.Board;
 import com.kh.junspring.board.service.BoardService;
 import com.kh.junspring.member.domain.Member;
@@ -137,19 +140,19 @@ public class BoardController {
 		mv.setViewName("board/listView");
 		return mv;
 	}
-
+	
 	@RequestMapping(value = "/board/detail.kh", method = RequestMethod.GET)
 	public ModelAndView boradDetailView(@RequestParam("page") Integer page, @RequestParam("boardNo") Integer boardNo,
 			ModelAndView mv, HttpSession session) {
 		// integer로 하면 null체크가 가능
 
 		try {
-			List<Reply> rList = bService.printAllReply(boardNo);
+//			List<Reply> rList = bService.printAllReply(boardNo);
 			Board board = bService.printOneByNo(boardNo);
 			session.setAttribute("boardNo", board.getBoardNo());
 			// 세션에 보듬넘버 저장 ->삭제하기 위해서
 //			if(board != null) {
-			mv.addObject("rList",rList);
+//			mv.addObject("rList",rList);
 			mv.addObject("board", board);
 			//삭제한페이지로 돌아가도록 구현하기위해 page처리
 			mv.addObject("page", page);
@@ -303,28 +306,100 @@ public class BoardController {
 		return mv;
 	}
 	
-	@PostMapping("/board/addReply.kh")
-	public ModelAndView addBoardReply(
-			ModelAndView mv,
-			@ModelAttribute Reply reply,
-			@RequestParam("page") Integer page,
-			HttpSession session) {
-		//INSERT INTO REPLY_TBL VALUES(#{replyNo},#{refBoardNo},#{replyContents},#{replyWriter},#{rCreateDate},#{rUpdateDate},#{rStatus})
-		Member member = (Member)session.getAttribute("loginUser");
-//		Board board = (Board)session.getAttribute("boardNo");
-		//로그인할때 set으로 세션에 뭐라고저장했는지 기입!
-		String replyWriter= member.getMemberId();
-//		int boardNo = board.getBoardNo();
-		int boardNo=reply.getRefBoardNo();
-		System.out.println(boardNo);
-		reply.setReplyWriter(replyWriter);
-//		reply.setRefBoardNo(boardNo);
+//	@PostMapping("/board/addReply.kh")
+//	public ModelAndView addBoardReply(
+//			ModelAndView mv,
+//			@ModelAttribute Reply reply,
+//			@RequestParam("page") Integer page,
+//			HttpSession session) {
+//		//INSERT INTO REPLY_TBL VALUES(#{replyNo},#{refBoardNo},#{replyContents},#{replyWriter},#{rCreateDate},#{rUpdateDate},#{rStatus})
+//		Member member = (Member)session.getAttribute("loginUser");
+////		Board board = (Board)session.getAttribute("boardNo");
+//		//로그인할때 set으로 세션에 뭐라고저장했는지 기입!
+//		String replyWriter= member.getMemberId();
+////		int boardNo = board.getBoardNo();
+//		int boardNo=reply.getRefBoardNo();
+//		System.out.println(boardNo);
+//		reply.setReplyWriter(replyWriter);
+////		reply.setRefBoardNo(boardNo);
+//		int result = bService.registerReply(reply);
+//		if(result>0) {
+//			mv.setViewName("redirect:/board/detail.kh?boardNo="+boardNo+"&page="+page);
+//		}
+//		
+//		return mv;
+//	}
+	
+	//ajax로 댓글기능 구현해보기
+	@ResponseBody
+	@RequestMapping(value = "/board/replyAdd.kh" , method = RequestMethod.POST)
+	public String boardReplyAdd(
+			@ModelAttribute Reply reply
+			,@RequestParam(value = "page" , required = false) Integer page
+			,HttpSession session) {
+		Member member = (Member) session.getAttribute("loginUser");
+		if(session.getAttribute("loginUser") == null) {
+			return "noneId";
+		}
+		String reWriter = member.getMemberId();
+		reply.setReplyWriter(reWriter);
 		int result = bService.registerReply(reply);
-		if(result>0) {
-			mv.setViewName("redirect:/board/detail.kh?boardNo="+boardNo+"&page="+page);
+		if(result > 0) {
+			return "success";
+			//html의 body부분에 이 값을 보내겠다 responsebody
+		}else {
+			return "fail";
 		}
 		
-		return mv;
+		
 	}
-
+	@ResponseBody
+	@RequestMapping(value = "/board/replyList.kh" , produces = "application/json;charset=utf-8" , method = RequestMethod.GET)
+	public String boardReplyList(
+			@RequestParam("boardNo") Integer boardNo
+			,ModelAndView mv) {
+		int bNo = (boardNo == 0 ) ? 1:boardNo;
+		List<Reply> rList = bService.printAllReply(bNo);
+		mv.addObject("rList",rList);
+		if(!rList.isEmpty()) {
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			return gson.toJson(rList);
+		}
+		return null;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/board/replyRemove.kh" , method = RequestMethod.POST)
+	public int replyRemove(
+			@RequestParam("replyNo") Integer replyNo
+			,@RequestParam("replyWriter") String replyWriter
+			,HttpSession session) {
+		Member member = (Member) session.getAttribute("loginUser");
+		System.out.println(replyWriter);
+		if(member==null) {
+			return 2;
+		}
+		if(!member.getMemberId().equals(replyWriter)) {
+			return 2;
+		}
+		int result = bService.removeReply(replyNo);
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/member/replyModify.kh" , method = RequestMethod.POST)
+	public String modifyReply(
+//			@RequestParam("replyNo") Integer replyNo,
+			@ModelAttribute Reply reply) {
+		int result = bService.modifyReply(reply);
+		
+		if(result>0) {
+			return "success";
+			
+		}else {
+			return "fail";
+		}
+		
+	}
+	
 }
