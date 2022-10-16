@@ -1,0 +1,50 @@
+##Controller에서 오류페이지
+return "common/errorPage";
+// errorPage.jsp로 안쓰는이유 ->5번다음 6번실행 
+// view Resolver가 bean에 담겨있고(/WEB-INF/spring/appServlet/servlet-context.xml) 앞에는 /WEB-INF/ 뒤에는.JSP가 지정되어이씀
+<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	<beans:property name="prefix" value="/WEB-INF/views/" />
+	<beans:property name="suffix" value=".jsp" />
+</beans:bean>
+
+
+##Controller 세션가져오기
+// http로 세션 가져오기 어노테이션으로도 할 수 있음
+// request.setAttribute("msg","실패!");
+// request.getRequestDispatcher("/주소/.jsp").forward(request,response); 이걸 Model로 대체할것임
+// Model model로 대체
+
+##session 동작 안할 때 
+<%@ page session="false"%> 이게 있으면 세션이 동작하지 않음 
+
+get은 url에 직접 넣어서 보이지만 post는 url에 보이지 않음
+
+파일넣기할때
+server 설정 -> server options -> serve modules 필수로 체크해줘야 됨 안그러면 이상한경로잡음
+
+// 이걸 써주면 오류내용 콘솔창에서도 확인할 수 있음
+			e.printStackTrace();
+			
+			
+config.xml에서 설정
+			<setting name="jdbcTypeForNull" value="NULL"/>
+	<!-- 만약에 null 데이터가 전달되었으면 빈칸이 아닌 NULL로 인식하도록 설정 -->
+	
+	
+Session에 set으로 넣은건 어느페이지에서도 el로 사용할 수 있다.
+
+
+<<게시글 삭제후 삭제글이 있었던 페이지로 돌아가기>>
+1.listView.jsp
+-쿼리 스트링page
+2.BoardController
+-detailView메소드, RequestParam으로 값 받고 detailView.jsp로 보내줌
+3. detailView.jsp에서 삭제할 때 쿼리스트링 page로 보내줌
+4. BoardController 
+- boardRemove메소드에서 RequestParam으로 받고 redirect할 때 page값 보내줌
+
+date api에따라 표시되는 타입이 다름
+javautil로 하면 국제시간으로나옴
+sql로 하면 2022-09-16으로나옴
+커스텀도 가능하긴할듯
+
