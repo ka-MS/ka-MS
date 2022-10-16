@@ -1,6 +1,9 @@
 package com.kh.junspring.member.store;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
+import org.mybatis.spring.SqlSessionTemplate;
 
 import com.kh.junspring.member.domain.Member;
 
@@ -15,4 +18,5 @@ public interface MemberStore {
 	public int deleteMember(SqlSession session, String memberId);
 	//selectOneById();
 	public Member selectOneById(SqlSession session,String memberId);
+	public List<Member> selectAllMember(SqlSession session);
 }

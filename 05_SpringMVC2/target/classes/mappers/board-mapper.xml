@@ -103,4 +103,9 @@
 	<select id="selectAllReply" resultMap="replyResultMap">
 		SELECT * FROM REPLY_TBL WHERE REF_BOARD_NO = #{refBoardNo} AND R_STATUS = 'Y'
 	</select>
+	
+	<delete id="deleteReply">
+		DELETE FROM REPLY_TBL WHERE REPLY_NO = #{replyNo}
+	</delete>
+	
 </mapper>

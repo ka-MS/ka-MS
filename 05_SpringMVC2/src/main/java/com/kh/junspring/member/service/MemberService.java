@@ -1,5 +1,7 @@
 package com.kh.junspring.member.service;
 
+import java.util.List;
+
 import com.kh.junspring.member.domain.Member;
 
 public interface MemberService {
@@ -13,4 +15,5 @@ public interface MemberService {
 	public int removerMember(String memberId);
 	//printOneById
 	public Member printOneById(String memberId);
+	public List<Member> searchAllMember();
 }

@@ -1,5 +1,7 @@
 package com.kh.junspring.member.service.logic;
 
+import java.util.List;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,12 @@ public class MemberServiceImpl implements MemberService{
 	public Member printOneById(String memberId) {
 		Member member = mStore.selectOneById(session, memberId);
 		return member;
+	}
+
+	@Override
+	public List<Member> searchAllMember() {
+		List<Member> mList = mStore.selectAllMember(session);
+		return mList;
 	}
 	
 

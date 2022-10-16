@@ -66,27 +66,120 @@
 	유저 번호 입력 :
 	<input type="text" id="user-num">
 	<br>
-	<p id="p5">비밀번호 : </p>
+	<p id="p5">비밀번호 :</p>
 	<button id="jq-btn5">실행 및 결과확인</button>
+	<h4>6. 서버로 전송값을 보내고 JSONArray로 결과 받아서 처리</h4>
+	<p>유저 번호를 보내서 해당 유저를 가져오고, 없는 경우 전체리스트 가져오기</p>
+	유저 번호 입력 :
+	<input type="text" id="find-num">
+	<br>
+	<p id="p6"></p>
+	<button id="jq-btn6">실행 및 결과확인</button>
+	<h4>7. GSON을 이용한 List 변환</h4>
+	<p>전체리스트 가져오기</p>
+	<p id="p7"></p>
+	<button id="jq-btn7">실행 및 결과확인</button>
+	example
+	<input type="text" id="data1">
+	<input type="text" id="data2">
+	<button id="asJson">asJson</button>
+
 
 
 
 
 
 	<script>
+		$("#asJson").on("click", function() {
+// 	var data1 = $("#data1").val()
+// 	var data2 =$("#data2").val()
+			$.ajax({
+				url : "asJson",
+// 				type : "get",
+// dataType:"json", 데이터타입 지정 혹은 controller에 produce 지정 해 주어야 jsontype으로 받을 수 있음
+				data : {
+					data1 : $("#data1").val(), data2 : $("#data2").val()
+				},
+				success : function(result) {
+					console.log(result)
+					console.log(result.data1 + " : " + result.data2);
+				}
+			})
+		})
+
+		//input 문자가 change 되었을때 ajax로 확인
+
+		$("#jq-btn7").on(
+				"click",
+				function() {
+					$.ajax({
+						url : "/ajax/ex6.kh",
+						type : "get",
+						data : {},
+						success : function(data) {
+							console.log(data);
+							var str = "";
+							for (var i = 0; i < data.length; i++) {
+								console.log(data[i].memberId);
+								str += data[i].memberId + ","
+										+ data[i].memberPwd + "<br>";
+								$("#p7").html(str);
+							}
+						},
+						error : function() {
+							console.log("출력 실패")
+						}
+					});
+				})
+
+		$("#jq-btn6").on(
+				"click",
+				function() {
+					var userId = $("#find-num").val()
+					console.log(userId);
+					$.ajax({
+						url : "/ajax/ex5.kh",
+						type : "get",
+						data : {
+							"userId" : userId
+						},//데이터, key값
+						success : function(data) {
+							console.log(data);
+							var str = ""; //아주중요!! 데이터를 누적복붙하는방법! Q) 어느정도 길이까지 한번에 담을수 있나 ?
+							for (var i = 0; i < data.length; i++) {
+								str += data[i].memberId + ","
+										+ data[i].memberPwd + "<br>"
+								$("#p6").html(str);
+							}
+							// 					str += 1 + "<br>";
+							// 					str += 2 + "<br>";
+							// 					str += 3 + "<br>";
+							// 					str += 4 + "<br>";
+							// 					$("#p6").append(str);
+
+						},
+						error : function() {
+							console.log("전송실패");
+						}
+
+					});
+				});
+
 		$("#jq-btn5").on("click", function() {
 			var userid = $("#user-num").val();
 			$.ajax({
 				url : "/ajax/ex4.kh",
 				type : "get",
-				data : {"userid": userid },
+				data : {
+					"userid" : userid
+				},
 				success : function(result) {
 					console.log(result);
 					$("#p5").html("비밀번호 : " + result.memberPwd);
 					console.log(result.rPwd)
-// 					console.log(result.userNo);
-// 					console.log(result.userName);
-// 					console.log(result.userAddr);
+					// 					console.log(result.userNo);
+					// 					console.log(result.userName);
+					// 					console.log(result.userAddr);
 				},
 				error : function() {
 					console.log("서버처리 실패");
@@ -133,7 +226,7 @@
 					"msg" : message
 				},
 				type : "get",
-				success : function() {
+				success : function() {//콜백함수 응답값을가지고 출력
 					console.log("서버 전송 성공");
 				},
 				error : function() {

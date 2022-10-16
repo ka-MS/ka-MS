@@ -26,5 +26,7 @@ public interface BoardService {
 	public List<Board> printAllByValue(String searchCondition, String searchValue, int currentPage, int boardLimit);
 	public int registerReply(Reply reply);
 	public List<Reply> printAllReply(int refBoardNo);
+	public int removeReply(Integer replyNo);
+	public int modifyReply(Reply reply);
 
 }
