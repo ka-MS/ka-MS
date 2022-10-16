@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -101,9 +103,10 @@ public class AjaxController {
 //		jsonArr.add(new JSONObject()); //json어레이에 제이슨객체를 넣을것임 json객체는 그냥 빈{}
 		// ==> {"memberId" : "khuser01" , "memberPwd" : "pass01"}.. 이렇게 베열에 객체 한개가 들어간것
 		// 반복문으로 모두넣어주기
-		boolean checkOne = false; //같은값이 나왔을경우 더이상 진행되지 못하도록 막는 트리거
-		for (Member mOne : mList) { //포문하나안에서 돌리려고 하면 아닌경우에도 담아버림
+		boolean checkOne = false; // 같은값이 나왔을경우 더이상 진행되지 못하도록 막는 트리거
+		for (Member mOne : mList) { // 포문하나안에서 돌리려고 하면 아닌경우에도 담아버림
 			JSONObject jsonObj = new JSONObject(); // ==> {}객체생성 ==> 초기화 후 다시넣고 초기화후 다시넣고 반복
+			
 			if (mOne.getMemberId().equals(userId)) {
 				jsonObj.put("memberId", mOne.getMemberId());
 				jsonObj.put("memberPwd", mOne.getMemberPwd());
@@ -133,9 +136,9 @@ public class AjaxController {
 //		return jsonArr.toJSONString();
 //		return mList.toString();
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value="/ajax/ex6.kh" ,produces = "application/json;charset=utf-8" , method = RequestMethod.GET)
+	@RequestMapping(value = "/ajax/ex6.kh", produces = "application/json;charset=utf-8", method = RequestMethod.GET)
 	public String exerciseAjax6() {
 		ArrayList<Member> mList = new ArrayList<Member>();
 		mList.add(new Member("khuser01", "pass01"));
@@ -144,15 +147,39 @@ public class AjaxController {
 		mList.add(new Member("khuser04", "pass04"));
 		mList.add(new Member("khuser05", "pass05"));
 		mList.add(new Member("khuser06", "pass06"));
-		//Gson으로 해 볼것임
-		//코드를 간결하게 줄일 수 있는데 pom.xml에 라이브러리를 추가해 주어야 사용할 수 있음
-		//반대로 json에서 자바의 오브젝트로 바꾸는데는 jackson을 씀
+		// Gson으로 해 볼것임
+		// 코드를 간결하게 줄일 수 있는데 pom.xml에 라이브러리를 추가해 주어야 사용할 수 있음
+		// 반대로 json에서 자바의 오브젝트로 바꾸는데는 jackson을 씀
 		Gson gson = new Gson();
 		return gson.toJson(mList);
-		
-		
-		
+
+	}
+
+	// 컨트롤러 어노테이션이 있는 클래스에 한해서 예외처리를 가능하게 하는 어노테이션 -> 서비스에서 사용하면안됨
+	@ExceptionHandler({ NullPointerException.class, NumberFormatException.class })
+	public String errorHandler() {
+
+		return "redirect:/home.kh";
 	}
 	
-	
+	@ResponseBody
+	@RequestMapping(value = "/ajax/asJson", produces = "application/json;charset=utf-8", method = RequestMethod.GET)
+	public String inputProc(@RequestParam("data1") String data1,@RequestParam("data2")  String data2) {
+//		System.out.println(data2);
+//		JSONObject obj = new JSONObject();
+//		JSONArray jarr = new JSONArray();
+//		obj.put("data1", data1);
+//		obj.put("data2", data2);
+//		jarr.add(obj);
+		// dataType:"json", 데이터타입 지정 혹은 controller에 produce 지정 해 주어야 jsontype으로 받을 수 있음
+		JsonObject obj = new JsonObject();
+//
+		obj.addProperty("data1", data1);
+
+		obj.addProperty("data2", data2);
+		System.out.println(obj);
+//		return jarr.toString();
+		return new Gson().toJson(obj);
+	}
+
 }
